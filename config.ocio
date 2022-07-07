@@ -52,6 +52,7 @@ roles:
 displays:
   sRGB:
     - !<View> {name: Standard, colorspace: sRGB}
+    - !<View> {name: ACES, colorspace: ACES - sRGB}
     - !<View> {name: Filmic, colorspace: Filmic sRGB}
     - !<View> {name: Filmic Log, colorspace: Filmic Log}
     - !<View> {name: Raw, colorspace: Raw}
@@ -64,7 +65,7 @@ displays:
     - !<View> {name: Standard, colorspace: Raw}
 
 active_displays: [sRGB, XYZ, None]
-active_views: [Standard, Filmic, Filmic Log, Raw, False Color]
+active_views: [Standard, ACES, Filmic, Filmic Log, Raw, False Color]
 
 colorspaces:
   - !<ColorSpace>
@@ -203,7 +204,28 @@ colorspaces:
         children:
             - !<ColorSpaceTransform> {src: Linear, dst: Filmic Log}
             - !<FileTransform> {src: filmic_to_0-70_1-03.spi1d, interpolation: linear}
-
+            
+  - !<ColorSpace>
+    name: ACES - sRGB
+    family: Output
+    equalitygroup: ""
+    bitdepth: 32f
+    description: |
+      ACES 1.0 Output - sRGB Output Transform
+      
+      ACES Transform ID : urn:ampas:aces:transformId:v1.5:ODT.Academy.RGBmonitor_100nits_dim.a1.0.3
+    isdata: false
+    allocation: uniform
+    allocationvars: [0, 1]
+    to_reference: !<GroupTransform>
+      children:
+        - !<FileTransform> {src: InvRRT.sRGB.Log2_48_nits_Shaper.spi3d, interpolation: tetrahedral}
+        - !<FileTransform> {src: Log2_48_nits_Shaper_to_linear.spi1d, interpolation: linear}
+    from_reference: !<GroupTransform>
+      children:
+        - !<FileTransform> {src: Log2_48_nits_Shaper_to_linear.spi1d, interpolation: linear, direction: inverse}
+        - !<FileTransform> {src: Log2_48_nits_Shaper.RRT.sRGB.spi3d, interpolation: tetrahedral}
+        
   - !<ColorSpace>
     name: False Color
     family: display
